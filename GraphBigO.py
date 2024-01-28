@@ -35,5 +35,5 @@ def PlotBigO(complexity):
     plt.ylabel(temp, fontsize = 30)
     #plt.tight_layout() 
     plt.title("O(" + temp + ")", fontsize = 40)
-    plt.show() 
-    #plt.savefig("plot.jpg")
+    #plt.show() 
+    plt.savefig("plot.jpg")
