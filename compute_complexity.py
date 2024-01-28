@@ -2,7 +2,6 @@ import argparse
 import ast
 from pathlib import Path
 import sympy
-
 complexities = {}
 
 class Visitor(ast.NodeVisitor):
@@ -104,6 +103,11 @@ class _ComplexityAnalyzer(Visitor):
                 step = self.evaluate(s.step)
                 return compute_slice(iterable, start, stop, step)
             raise Exception()
+        if isinstance(expr, ast.UnaryOp):
+            if isinstance(expr.op, ast.USub):
+                return -self.evaluate(expr.operand)
+            return self.evaluate(expr.operand)
+
         if isinstance(expr, ast.BinOp):
             if isinstance(expr.op, ast.Mult):
                 return self.evaluate(expr.left) * self.evaluate(expr.right)
