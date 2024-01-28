@@ -65,12 +65,21 @@ class _ComplexityAnalyzer(Visitor):
         self.symbol_table = {}
 
     def visit_Assign(self, node):
-        self.generic_visit(node)
         for target in node.targets:
             self.symbol_table[target.id] = self.evaluate(node.value)
+        self.result[-1] += 1
+        self.generic_visit(node)
 
     def visit_AugAssign(self, node):
+        self.result[-1] += 1
         self.generic_visit(node)
+
+    def visit_If(self, node):
+        self.result[-1] += 1
+        self.generic_visit(node)
+
+    def visit_Expr(self, node):
+        self.result[-1] += 1
 
     def visit_For(self, node):
         iter = self.evaluate(node.iter)
@@ -153,12 +162,16 @@ def compute_slice(iterable, start, stop, step):
     start = start or 0
     stop = stop or iterable.length
     step = step or 1
+    if abs(step) == 1:
+        return _Iterable((stop-start)/step)
     return _Iterable(sympy.ceiling((stop-start)/step))
 
 def compute_range(start, stop=None, step=1):
     if stop is None:
         stop = start
         start = 0
+    if abs(step) == 1:
+        return _Iterable((stop-start)/step)
     return _Iterable(sympy.ceiling((stop-start)/step))
 
 class _Iterable():
