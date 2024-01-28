@@ -1,6 +1,7 @@
 import argparse
 import ast
 from pathlib import Path
+import re
 import sympy
 complexities = {}
 
@@ -193,8 +194,20 @@ def find_functions(tree):
 
 def compute_complexity(func_def):
     analyzer = _ComplexityAnalyzer()
-    complexity = analyzer.analyze(func_def).expand()
-    return complexity, sympy.simplify(str(complexity).split("+")[0])
+    complexity = analyzer.analyze(func_def)
+    try:
+        complexity = complexity.expand()
+        terms = re.split(r"[+-]", str(complexity))
+        big_o = str(sympy.simplify("+".join(terms))).split('+')[0]
+        print("Replacing", big_o)
+        big_o = re.sub(r"^[^a-zA-Z]*", "", big_o)
+        if big_o.isdigit():
+            big_o = "1"
+    except:
+        big_o = "1"
+    big_o = sympy.simplify(big_o)
+
+    return complexity, big_o
 
 def main():
     parser = argparse.ArgumentParser()
